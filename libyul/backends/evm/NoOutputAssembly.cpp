@@ -207,9 +207,44 @@ void NoOutputAssembly::appendReturnContract(ContainerID)
 NoOutputEVMDialect::NoOutputEVMDialect(EVMDialect const& _copyFrom):
 	EVMDialect(_copyFrom.evmVersion(), _copyFrom.eofVersion(), _copyFrom.providesObjectAccess())
 {
-	for (auto& fun: m_functions)
-		if (fun)
-			modifyBuiltinToNoOutput(*fun);
+	m_functions = [&]
+	{
+		// save the modified functions here
+		static std::vector<BuiltinFunctionForEVM> const noOutputBuiltins = []
+		{
+			std::vector<BuiltinFunctionForEVM> modifiedBuiltins;
+			modifiedBuiltins.reserve(allBuiltins().functions().size());
+
+			for (auto const& [_, builtin]: allBuiltins().functions())
+			{
+				auto noOutputFunction = builtin;
+				modifyBuiltinToNoOutput(noOutputFunction);
+				modifiedBuiltins.push_back(std::move(noOutputFunction));
+			}
+
+			return modifiedBuiltins;
+		}();
+
+		std::vector<BuiltinFunctionForEVM const*> result;
+		result.reserve(m_functions.size());
+		for (auto const* builtinFunction: m_functions)
+		{
+			if (builtinFunction)
+			{
+				auto it = noOutputBuiltins.find(builtinFunction);
+				if (it == noOutputBuiltins.end())
+				{
+					auto noOutputFunction = *builtinFunction;
+					modifyBuiltinToNoOutput(noOutputFunction);
+					it = noOutputBuiltins.emplace(builtinFunction, std::move(noOutputFunction)).first;
+				}
+				result.emplace_back(&it->second);
+			}
+			else
+				result.emplace_back(nullptr);
+		}
+		return result;
+	}();
 }
 
 BuiltinFunctionForEVM const& NoOutputEVMDialect::builtin(BuiltinHandle const& _handle) const
