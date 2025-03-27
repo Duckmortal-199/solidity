@@ -110,7 +110,7 @@ void PostTypeContractLevelChecker::checkStorageLayoutSpecifier(ContractDefinitio
 		m_errorReporter.typeError(
 			6396_error,
 			baseSlotExpression.location(),
-			"The base slot of the storage layout must evaluate to a rational number."
+			"The base slot of the storage layout must evaluate to a rational integer number."
 		);
 		return;
 	}
