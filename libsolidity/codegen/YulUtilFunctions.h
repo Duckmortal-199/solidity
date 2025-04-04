@@ -268,7 +268,8 @@ public:
 	/// @returns the name of a function that will clear the storage area given
 	/// by the start and end (exclusive) parameters (slots).
 	/// signature: (start, end)
-	std::string clearStorageRangeFunction(Type const& _type, bool _assumeEndAfterStart);
+	/// if _canOverflow is true, it treats the storage as circular and clears by wrapping around.
+	std::string clearStorageRangeFunction(Type const& _type, bool _canOverflow);
 
 	/// @returns the name of a function that will clear the given storage array
 	/// signature: (slot) ->
