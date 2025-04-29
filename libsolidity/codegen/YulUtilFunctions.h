@@ -619,7 +619,7 @@ private:
 	std::string cleanUpDynamicByteArrayEndSlotsFunction(ArrayType const& _type);
 
 	/// @returns the name of a function that increases size of byte array
-	/// when we resize byte array frextractUsedSetLenom < 32 elements to >= 32 elements or we push to byte array of size 31 copying of data will  occur
+	/// when we resize byte array from < 32 elements to >= 32 elements or we push to byte array of size 31 copying of data will  occur
 	/// signature: (array, data, oldLen, newLen)
 	std::string increaseByteArraySizeFunction(ArrayType const& _type);
 
