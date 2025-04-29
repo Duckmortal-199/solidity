@@ -289,15 +289,10 @@ void ArrayUtils::copyArrayToStorage(ArrayType const& _targetType, ArrayType cons
 			// stack: target_ref target_data_end source_data_pos target_data_pos_updated source_data_end
 			_context << Instruction::POP << Instruction::SWAP1 << Instruction::POP;
 			// stack: target_ref target_data_end target_data_pos_updated
-			if (_targetType.isDynamicallySized())
-				ArrayUtils(_context).clearDynamicArray(_targetType);
+			if (targetBaseType->storageBytes() < 32)
+				utils.clearStorageLoop(TypeProvider::uint256(), !targetBaseType->isDynamicallySized());
 			else
-			{
-				if (targetBaseType->storageBytes() < 32)
-					utils.clearStorageLoop(TypeProvider::uint256(), /* _canOverflow */ true);
-				else
-					utils.clearStorageLoop(targetBaseType, /* _canOverflow */ true);
-			}
+				utils.clearStorageLoop(targetBaseType, !targetBaseType->isDynamicallySized());
 			_context << Instruction::POP;
 		}
 	);
